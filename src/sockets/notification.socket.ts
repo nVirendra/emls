@@ -3,12 +3,13 @@ import {
   addUserSocket,
   removeUserSocket,
   logOnlineUsers,
+  getUserSocket,
 } from '../utils/socketStore';
 
 export const initNotificationSocket = (io: Server) => {
   io.on('connection', (socket: Socket) => {
     const userId = socket.handshake.query.userId as string;
-
+    console.log('userId: ', userId);
     if (userId) {
       addUserSocket(userId, socket.id);
       console.log(`✅ ${userId} connected with socket ID ${socket.id}`);
@@ -30,11 +31,12 @@ export const sendNotificationToUser = (
   receiverId: string,
   data: any
 ) => {
-  const socketId = require('../utils/socketStore').getUserSocket(receiverId);
+  const socketId = getUserSocket(receiverId);
 
   console.log(`📨 Notifying ${receiverId} → socket: ${socketId}`);
 
   if (socketId) {
+    console.log(socketId, data);
     io.to(socketId).emit('new-notification', data);
   } else {
     console.warn(`⚠️ No socket found for user ${receiverId}`);
