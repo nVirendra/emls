@@ -31,9 +31,9 @@ export const createPost = async (req: AuthRequest, res: Response) => {
     });
 
     const savedPost = await newPost.save();
-    return res.status(201).json(savedPost);
+    return res.status(201).json({ status: true,result:savedPost});
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err });
+    res.status(500).json({status: false, message: 'Server error', error: err });
   }
 };
 
@@ -46,7 +46,7 @@ export const getFeedPosts = async (req: AuthRequest, res: Response) => {
       .populate('userId', 'name profilePic')
       .populate('comments.userId', 'name profilePic');
 
-    res.json(posts);
+    res.json({status:true,result:posts});
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err });
   }
@@ -79,7 +79,7 @@ export const likePost = asyncHandler(
     }
 
     const updated = await Post.findById(req.params.id);
-    res.json(updated);
+    res.json({status:true,result:updated});
   }
 );
 
@@ -95,7 +95,7 @@ export const commentOnPost = asyncHandler(
     post.comments.push({ userId: req.user._id, comment });
     await post.save();
 
-    res.json(post);
+    res.json({status:true,result:post});
   }
 );
 
@@ -107,9 +107,9 @@ export const getUserPosts = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 })
       .populate('userId', '_id name');
 
-    res.status(200).json(posts);
+    res.status(200).json({status:true,result:posts});
   } catch (error) {
     console.error('Error fetching user posts:', error);
-    res.status(500).json({ message: 'Failed to fetch posts' });
+    res.status(500).json({ status:false, message: 'Failed to fetch posts' });
   }
 };

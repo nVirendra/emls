@@ -6,7 +6,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400).json({ message: 'Email already registered' });
+    res.status(400).json({ status: false , result:[], message: 'Email already registered' });
     return;
   }
 
@@ -16,6 +16,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   const token = generateToken(user._id.toString());
 
   res.status(201).json({
+    status: true,
     token,
     user: { id: user._id, name: user.name, email: user.email },
   });
@@ -26,13 +27,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const user = (await User.findOne({ email })) as IUser;
 
   if (!user || !(await user.comparePassword(password))) {
-    res.status(400).json({ message: 'Invalid credentials' });
+    res.status(400).json({status: false, message: 'Invalid credentials' });
     return;
   }
 
   const token = generateToken(user._id.toString());
 
   res.json({
+    status: true,
     token,
     user: {
       id: user._id,
